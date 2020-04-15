@@ -25,6 +25,7 @@ let afkWindow = document.getElementById('afk-window')
 let serverMessageWindow = document.getElementById('server-message')
 let serverMessage = document.getElementById('message')
 let overlay = document.getElementById('overlay')
+
 // Buttons
 let leaveRoom = document.getElementById('leave-room')
 let joinRed = document.getElementById('join-red')
@@ -45,14 +46,17 @@ let buttonServerMessageOkay = document.getElementById('server-message-okay')
 let buttonBasecards = document.getElementById('base-pack')
 let buttonDuetcards = document.getElementById('duet-pack')
 let buttonUndercovercards = document.getElementById('undercover-pack')
-let buttonNLSScards = document.getElementById('nlss-pack')
+// let buttonNLSScards = document.getElementById('nlss-pack')
+
 // Slider
 let timerSlider = document.getElementById('timer-slider')
 let timerSliderLabel = document.getElementById('timer-slider-label')
+
 // Player Lists
 let undefinedList = document.getElementById('undefined-list')
 let redTeam = document.getElementById('red-team')
 let blueTeam = document.getElementById('blue-team')
+
 // UI Elements
 let scoreRed = document.getElementById('score-red')
 let scoreBlue = document.getElementById('score-blue')
@@ -172,10 +176,11 @@ buttonDuetcards.onclick = () => {
 buttonUndercovercards.onclick = () => {
   socket.emit('changeCards', {pack:'undercover'})
 }
-// User Clicks card pack
+
+/* // User Clicks card pack
 buttonNLSScards.onclick = () => {
   socket.emit('changeCards', {pack:'nlss'})
-}
+} */
 
 // When the slider is changed
 timerSlider.addEventListener("input", () =>{
@@ -269,17 +274,17 @@ socket.on('switchRoleResponse', (data) =>{  // Response to Switching Role
   }
 })
 
-socket.on('gameState', (data) =>{           // Response to gamestate update
-  if (data.difficulty !== difficulty){  // Update the clients difficulty
+socket.on('gameState', (data) =>{			// Response to gamestate update
+  if (data.difficulty !== difficulty){		// Update the clients difficulty
     difficulty = data.difficulty
-    wipeBoard();                        // Update the appearance of the tiles
+    wipeBoard();							// Update the appearance of the tiles
   }
-  mode = data.mode                      // Update the clients game mode
-  updateInfo(data.game, data.team)      // Update the games turn information
-  updateTimerSlider(data.game, data.mode)          // Update the games timer slider
-  updatePacks(data.game)                // Update the games pack information
-  updatePlayerlist(data.players)        // Update the player list for the room
-  updateBoard(data.game.board)          // Update the board display
+  mode = data.mode							// Update the clients game mode
+  updateInfo(data.game, data.team)			// Update the games turn information
+  updateTimerSlider(data.game, data.mode)	// Update the games timer slider
+  updatePacks(data.game)					// Update the games pack information
+  updatePlayerlist(data.players)			// Update the player list for the room
+  updateBoard(data.game.board)				// Update the board display
 })
 
 
@@ -336,8 +341,8 @@ function updatePacks(game){
   else buttonDuetcards.className = ''
   if (game.undercover) buttonUndercovercards.className = 'enabled'
   else buttonUndercovercards.className = ''
-  if (game.nlss) buttonNLSScards.className = 'enabled'
-  else buttonNLSScards.className = ''
+  /* if (game.nlss) buttonNLSScards.className = 'enabled'
+  else buttonNLSScards.className = '' */
   document.getElementById('word-pool').innerHTML = "Word Pool: " + game.words.length
 }
 

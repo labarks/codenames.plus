@@ -8,15 +8,18 @@ let express = require('express')
 let app = express()
 
 //Set up server
-let server = app.listen(process.env.PORT || 2000, listen);
+let server = app.listen(process.env.PORT || 3000, listen);
 
 // Callback function confirming server start
 function listen(){
-  let host = server.address().address;
+  let host 
+  if(server.address().address === '::')
+  {host = 'localhost'} else {host = server.address().address}
   let port = server.address().port;
   console.log('Codenames Server Started at http://' + host + ':' + port);
 }
 
+/* 
 // Force SSL
 app.use((req, res, next) => {
   if (req.header('x-forwarded-proto') !== 'https') {
@@ -24,7 +27,7 @@ app.use((req, res, next) => {
   } else {
     next();
   }
-});
+}); */
 
 // Files for client
 app.use(express.static('public'))
@@ -219,15 +222,16 @@ io.sockets.on('connection', function(socket){
       game.duet = !game.duet
     } else if (data.pack === 'undercover'){
       game.undercover = !game.undercover
-    } else if (data.pack === 'nlss'){
+    } /* else if (data.pack === 'nlss'){
       game.nlss = !game.nlss
-    }
+	} */
+	
     // If all options are disabled, re-enable the base pack
-    if (!game.base && !game.duet && !game.undercover && !game.nlss) game.base = true
+	/* if (!game.base && !game.duet && !game.undercover && !game.nlss) game.base = true */
+	if (!game.base && !game.duet && !game.undercover) game.base = true
 
     game.updateWordPool()
     gameUpdate(room)
-    
   })
 
   // Change timer slider
