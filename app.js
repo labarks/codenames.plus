@@ -1,14 +1,43 @@
 
 ////////////////////////////////////////////////////////////////////////////
 
-// Express
-let express = require('express')
+// import required packages
+const express = require('express');
 
-// Create app
-let app = express()
+const https = require('https');
+const http = require('http');
 
+const fs = require('fs');
+
+var redirectToHTTPS = require('express-http-to-https').redirectToHTTPS
+
+// create new express app and assign it to `app` constant
+const app = express();
+
+// server port configuration
+const PORT = 8080;
+const SSL = 8443;
+
+// let host = 'ec2-3-82-202-44.compute-1.amazonaws.com'
+
+// Listen both http & https ports
+const httpServer = http.createServer(app);
+const httpsServer = https.createServer({
+  key: fs.readFileSync('/home/ec2-user/privatekey.pem'),
+  cert: fs.readFileSync('/home/ec2-user/publiccert.pem'),
+}, app);
+
+httpServer.listen(PORT || 8080, () => {
+    console.log(`HTTP Server running on port ${PORT}`);
+});
+
+httpsServer.listen(SSL || 8443, () => {
+    console.log(`HTTPS Server running on port ${SSL}`);
+});
+
+/* 
 //Set up server
-let server = app.listen(process.env.PORT || 3000, listen);
+let server = app.listen(PORT || 3000, listen);
 
 // Callback function confirming server start
 function listen(){
@@ -17,14 +46,19 @@ function listen(){
   {host = 'localhost'} else {host = server.address().address}
   let port = server.address().port;
   console.log('Codenames Server Started at http://' + host + ':' + port);
-}
+  console.log('COMPUTERNAME: ' + process.env.COMPUTERNAME)
+} */
+
+app.use(redirectToHTTPS([/localhost:(\d{4})/], [/\/insecure/], 301));
 
 /* 
 // Force SSL
 app.use((req, res, next) => {
   if (req.header('x-forwarded-proto') !== 'https') {
+	// console.log('header: ' + req.header('x-forwarded-proto'))
     res.redirect(`https://${req.header('host')}${req.url}`)
-  } else {
+	// console.log(`Redirect: https://${req.header('host')}${req.url}`)
+} else {
     next();
   }
 }); */
@@ -33,7 +67,7 @@ app.use((req, res, next) => {
 app.use(express.static('public'))
 
 // Websocket
-let io = require('socket.io')(server)
+let io = require('socket.io')(httpsServer) // was (server), not (httpsServer)
 
 // Catch wildcard socket events
 var middleware = require('socketio-wildcard')()
